@@ -219,13 +219,14 @@ public class Summary {
         for (Range range : histogram) {
             //for the topMost words in the arraylist sorted, i.e. the top percentage of the tf-idf weighted words
             for (int j = (int) ((1 - topWords) * orderToBeConsidered.size()); j < orderToBeConsidered.size(); j++) {
+                String currentWord = orderToBeConsidered.get(j).word;
                 //if the current range localTF field contains this word, increment the range's importance by the global tf-idf weight of the word
-                if (range.localTF.containsKey(sortedTFIDF.get(j).word)) {
+                if (range.localTF.containsKey(currentWord)) {
                     double termImportance = 0;
                     if (weightType == Weight.TF) {
-                        termImportance = tf.get(sortedTFIDF.get(j).word);
+                        termImportance = tf.get(currentWord);
                     } else if (weightType == Weight.TFIDF) {
-                        termImportance = tfIdf.get(sortedTFIDF.get(j).word);
+                        termImportance = tfIdf.get(currentWord);
                     }
                     range.importance += termImportance;
                 }
@@ -252,7 +253,7 @@ public class Summary {
 
         System.out.println("Sorted TFIDF values of all words in transcript: ");
         //to see sorted TF-values
-        for (int i = 0; i < sortedTFIDF.size(); i++) {
+        for (int i = 0; i < sortedTF.size(); i++) {
             System.out.println(stemmedToUnstemmed.get(sortedTF.get(i).word) + "\t\t" + sortedTF.get(i).count);
         }
 
@@ -295,8 +296,6 @@ public class Summary {
         }
         return groups;
     }
-
-
 
 
 }
