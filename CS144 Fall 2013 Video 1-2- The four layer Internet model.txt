@@ -1,0 +1,168 @@
+0:01In the last video you learned how different applications -- such as BitTorrent, Skype
+0:06and the World Wide Web – communicate over the Internet using a bi-directional reliable
+0:12byte stream.
+0:13It takes a lots of different pieces working together to create this reliable communication
+0:17model for our applications. But even though we use a huge variety of different Internet
+0:24applications, sending many kinds of data at very different speeds, there are surprisingly
+0:28strong similarities in the way applications send and receive data. For example, applications
+0:34want to send and receive data without having to worry about the path, or route, that the
+0:38data takes across the Internet. And almost all applications want to be confident that
+0:43their data is correctly delivered, with any lost or corrupted data automatically retransmitted
+0:48until it is received correctly.
+0:51The early Internet pioneers created the “4 Layer Internet Model” to describe the hierarchy
+0:56of operations that make up the Internet, so that applications can reuse the same building
+1:01blocks over and over again, without having to create them from scratch for every application.
+1:06Layering is an important and frequently used concept in networking and we’ll be seeing
+1:10it many times throughout this course. There is even a video devoted just to the concept
+1:14of layering.
+1:15Let’s take a look at what each layer of the 4 Layer Internet model does. It helps
+1:19to remember that all four layers are there to enable applications in the end-hosts communicate
+1:25reliably.
+1:26To explain how it works, I’m going to start at the bottom layer. We’ll see that each
+1:30layer has a different responsibility, with each layer building a service on top of the
+1:34one below, all the way to the top where we have the bi-directional reliable byte stream
+1:38communication between applications.
+1:40Let’s start with the Link Layer. The Internet is made up of end-hosts, links
+1:45and routers. Data is delivered hop-by-hop over each link in turn. Data is delivered
+1:50in packets. A packet consists of the data we want to be delivered, along with a header
+1:56that tells the network where the packet is to be delivered, where it came from and so
+2:01on. <Draw topology and hop by hop delivery of
+2:03data> The Link Layer’s job is to carry the data
+2:05over one link at a time. You’ve probably heard of Ethernet and WiFi – these are two
+2:09examples of different Link layers.
+2:14The next layer up is, for us, the most important layer: the Network layer.
+2:19The network layer’s job is to deliver packets end-to-end across the Internet from the source
+2:24to the destination.
+2:26A packet is an important basic building block in networks. A packet is the name we give
+2:29to a self-contained collection of data, plus a header that describes what the data is,
+2:33where it is going and where it came from. You will often see packets drawn like this:
+2:38<draw a packet with header and data>
+2:41Network layer packets are called datagrams. They consist of some data and a head containing
+2:47the “To” and “From” addresses – just like we put the “To:” and “From” addresses
+2:51on a letter. <Draw a datagram with To/From addresses> .
+2:53The Network hands the datagram to the Link Layer below <click to wipe arrows down>, telling
+2:58it to send the datagram over the first link. In other words, the Link Layer is providing
+3:01a *service* to the Network Layer. Essentially, the Link Layer says: “if you give me a datagram
+3:07to send, I will transmit it over one link for you”.
+3:12At the other end of the link is a router. The Link Layer of the router accepts the datagram
+3:17from the link, and hands it up to the Network Layer in the router. The Network Layer on
+3:22the router examines the destination address of the datagram, and is responsible for routing
+3:26the datagram one hop at a time towards its eventual destination. It does this by sending
+3:31to the Link Layer again, to carry it over the next link. And so on until it reaches
+3:41the Network Layer at the destination. <sequence of clicks shows the steps>
+3:47Notice that the Network Layer does not need to concern itself with *how* the Link Layer
+3:50sends the datagram over the link. In fact, different Link Layers work in very different
+3:55ways; Ethernet and WiFi are clearly very different. This separation of concerns between the Network
+4:03Layer and the Link Layer allows each to focus on its job, without worrying about how the
+4:07other layer works. It also means that a single Network Layer has a common way to talk to
+4:12many different Link Layers by simply handing them datagrams to send. This separation of
+4:17concerns is made possibly by the modularity of each layer and a common well-defined API
+4:23to the layer below.
+4:27In the internet, the network layer is special: When we send packets into the Internet, we
+4:31must use the Internet Protocol. It is the Internet Protocol, or IP, that holds the Internet
+4:37together. We’ll learn more about the details of IP in later videos. But for now it’s
+4:41good to know some basic facts about IP.
+4:44<bulleted list to appear on screen> IP makes a best-effort attempt to deliver
+4:49our packets to the other end. But it makes no promises.
+4:53IP packets can get lost, can be delivered out of order, and can be corrupted. There
+4:58are no guarantees.
+5:02This may come as a surprise. How can the Internet work at all when the packets are not guaranteed
+5:08to be delivered? Well, if an application wants a guarantee that its data will be retransmitted
+5:14when necessary and will be delivered to the application in order and without corruption
+5:20then it needs another protocol running on top of IP. This is the job of the Transport
+5:25Layer….
+5:28The most common Transport Layer is TCP <draw TCP: Transmission Control Protocol>, or the
+5:31Tranmission Control Protocol. (You have probably heard of TCP/IP, which is when an application
+5:35uses both TCP and IP together).
+5:39TCP makes sure that data sent by an application at one end of the Internet is correctly delivered
+5:45– in the right order - to the application at the other end of the Internet. If the Network
+5:50Layers drops some datagrams, TCP will retransmit them, multiple times if need-be. If the Network
+5:56Layer delivers them out of order – perhaps because two packets follow a different path
+6:00to their destination – TCP will put the data back into the right order again. In later
+6:05videos you will learn a lot about TCP and how it works. For now, the main thing to remember
+6:11is that TCP provides a service to an application guaranteeing correct in-order delivery of
+6:16data, running on top of the Network Layer service, which provides an unreliable datagram
+6:23delivery service.
+6:27As I’m sure you can imagine, applications such as a web client, or an email client,
+6:31find TCP very useful indeed. By employing TCP to make sure data is delivered correctly,
+6:36they don’t have to worry about implementing all of the mechanisms inside the application.
+6:41They can take advantage of the huge effort that developers put into correctly implementing
+6:45TCP, and reuse it to deliver data correctly. Reuse is another big advantage of layering.
+6:54But not all applications need data to be delivered correctly. For example, if a video conference
+6:59application is sending a snippet of video in a packet, there may be no point waiting
+7:03for the packet to be retransmitted multiple times; better to just move on. Some applications
+7:09just don’t need the TCP service.
+7:12If an application doesn’t need reliable delivery, it can use the much simpler UDP
+7:16– or user datagram protocol – instead <draw: UDP: User Datagram Protocol>. UDP just
+7:21bundles up application data and hands it to the Network Layer for delivery to the other
+7:25end. UDP offers no delivery guarantees.
+7:28In other words, an Application has the choice of at least two different Transport Layer
+7:34services: TCP and UDP. There are in fact many other choices too, but these are the most
+7:39commonly used transport layer services.
+7:44Finally we have the Application Layer at the top of the 4 Layer Model. There are of course
+7:49many thousands of applications that use the Internet. While each application is different,
+7:54it can reuse the Transport Layer by using the well-defined API from the Application
+7:59Layer to the TCP or UDP service beneath.
+8:03As we saw in the last video, applications typically want a bi-directional reliable byte
+8:08stream between two end points. They can send whatever byte-stream they want, and Applications
+8:13have a protocol of their own that defines the syntax and semantics of data flowing between
+8:17the two end points. <click to make second 4layer stack appear> For example, as we saw
+8:21in the last video, when a web client requests a page from a web server <draw them on Application
+8:26layer>, the web client sends a GET request. This is one of the commands of the hypertext
+8:30transfer protocol, or http. http dictates that the GET command is sent as an ASCII string,
+8:37along with the URL of the page being requested. As far as the Application Layer is concerned,
+8:44the GET request is sent directly to its peer at the other end – the web server Application
+8:49<draw dotted lines to show peer communication of GET request>. The Application doesn’t
+8:53need to know how it got there, or how many times it needed to be retransmitted. At the
+8:58web client, the Application Layer hands the GET request to the TCP layer, which provides
+9:02the service of making sure it is reliably delivered. It does this using the services
+9:06of the Network layer, which in turn uses the services of the Link Layer.
+9:10We say that each layer communicates with its peer layer <draw dotted lines>. It’s as
+9:13if each layer is only communicating with the same layer at the other end of the link or
+9:17Internet, without regard for how the layer below gets the data there.
+9:24Putting it all together then….
+9:27Network engineers find it convenient to arrange all the functions that make up the Internet
+9:30into *Layers*. At the top is the Application, such as BitTorrent
+9:34or Skype or the world wide web, which talks to its peer layer at the destination <draw
+9:38dotted line>. When the application has data to send, it hands the data to the Transport
+9:42layer <draw red arrows down>, which has the job of delivering the data reliably (or not)
+9:46to the other end. The Transport Layer sends data to the other end by handing it to the
+9:50Network Layer <draw red arrow down>, which has the job of breaking the data into packets,
+9:54each with the correct destination address. Finally, the packets are handed to the Link
+9:57Layer, which has the responsibility of delivering the packet from one hop to the next along
+10:01its path.
+10:02The data makes its way, hop by hop, from one router to the next. The Network Layer forwards
+10:06it to the next router, one at a time, until it reaches the destination. There, the data
+10:11is passed up the layers, until it reaches the Application.
+10:15Application: Bi-directional reliable byte stream between two applications, using application-specific
+10:24semantics (e.g. http, bit-torrent).
+10:29Transport: Guarantees correct, in-order delivery of data end-to-end. Controls congestion.
+10:37Network: Delivers datagrams end-to-end. Best-effort delivery – no guarantees. Must use the Internet
+10:47Protocol (IP).
+10:48Link: Delivers data over a single link between an end host and router, or between routers
+10:53Now we’ve seen what the 4 layers are, I’ll finish with two extra things you need to know….
+10:59The first is that IP is often referred to as “the thin waist” of the Internet. This
+11:05is because if we want to use the Internet, we have to use the Internet Protocol, or IP.
+11:09We have no choice.
+11:11But we have lots of choices for Link Layers: IP runs over many different Link Layers, such
+11:16as Ethernet, WiFi, DSL, 3G cellular, and so on.
+11:21On top of the unreliable IP layer, we can choose between many different transport layers
+11:25. We already saw TCP and UDP. There is RTP for real time data and many others too. And
+11:32of course there are tens of thousands of different applications.
+11:39The second thing you should know is that in the 1980s the International Standards Organization,
+11:44or ISO created a 7-layer model to represent any type of network. It was called the 7-layer
+11:50Open Systems Interconnection or OSI model. We don’t spend any time on it in this course
+11:56because it has been replaced by the 4-layer Internet model. If you’re interested, you’ll
+12:02find any networking textbook and Wikipedia describes the 7 layers in lots of detail.
+12:10The 7 layer model defined layers that were combined in the 4 layer Internet model. For
+12:15example, what we call the Link Layer today was separated into the Link Layer – that
+12:21defined the framing format – and the Physical Layer that defined things like the voltage
+12:26levels on a cable, or the physical dimensions of a connector. The Network Layers are pretty
+12:32much the same. The Transport and Application Layers are each represented by 2 layers in
+12:39the OSI model. These <annotate the text in the middle> are examples of commonly used
+12:44Internet protocols, and how they map to the OSI numbering scheme.
+12:55Today, the only real legacy of the 7-layer OSI model is the numbering system. You’ll
+13:02often hear network engineers refer to the Network Layer as “Layer 3”, <circle it>
+13:07even though it is the 2nd layer up from the bottom in the Internet Layer. Similarly, you’ll
+13:13hear people refer to Ethernet as a Layer 2 protocol <circle it>, and the Application
+13:19as Layer 7 <circle it>.
